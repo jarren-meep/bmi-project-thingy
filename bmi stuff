@@ -1,0 +1,103 @@
+package com.example.a18016496.mybmicalculator;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import java.util.Calendar;
+
+public class MainActivity extends AppCompatActivity {
+
+    Button calculate, reset;
+    EditText weight, height;
+    TextView bmi, date, statement;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        calculate = findViewById(R.id.calculate);
+        reset = findViewById(R.id.reset);
+        weight = findViewById(R.id.weight);
+        height = findViewById(R.id.height);
+        bmi = findViewById(R.id.bmi);
+        date = findViewById(R.id.date);
+        statement = findViewById(R.id.statement);
+
+        calculate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Double wite = Double.parseDouble(weight.getText().toString());
+                Double hite = Double.parseDouble(height.getText().toString());
+                Double total = wite / (hite*hite);
+                String result = String.valueOf(total);
+                bmi.setText(result);
+                if (total < 18.5) {
+                    statement.setText("You are underweight");
+                } else if (total >= 18.5 && total < 25) {
+                    statement.setText("Your BMI is normal");
+                } else if (total >= 25 && total < 30) {
+                    statement.setText("You are overweight");
+                } else if (total > 30) {
+                    statement.setText("You are obese");
+                }
+            }
+        });
+
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bmi.setText("");
+                date.setText("");
+                weight.setText("");
+                height.setText("");
+                statement.setText("");
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String sss = prefs.getString("moop", "Unknown date");
+        date.setText(sss);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        Calendar now = Calendar.getInstance();  //Create a Calendar object with current date and time
+        String datetime = now.get(Calendar.DAY_OF_MONTH) + "/" +
+                (now.get(Calendar.MONTH)+1) + "/" +
+                now.get(Calendar.YEAR) + " " +
+                now.get(Calendar.HOUR_OF_DAY) + ":" +
+                now.get(Calendar.MINUTE);
+        float wite = Float.parseFloat(weight.getText().toString());
+        float hite = Float.parseFloat(height.getText().toString());
+        //Get the user input from EditText and store it as a variable
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //Obtain an instance of SharedPreferences
+        SharedPreferences.Editor prefEdit = prefs.edit();
+        //Obtain an instance of SharedPreferences Editor for update later
+        prefEdit.putString("moop", datetime);
+        prefEdit.putFloat("meep", wite);
+        prefEdit.putFloat("leep", hite);
+        //Add a key,value pair
+        prefEdit.commit();
+        //Call it to save changes to the SharedPreferences
+    }
+
+}
+
+
